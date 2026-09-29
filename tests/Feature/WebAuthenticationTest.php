@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Post;
 use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
@@ -36,6 +37,26 @@ class WebAuthenticationTest extends TestCase
         Event::assertDispatched(Registered::class);
 
         $this->get(route('posts.create'))->assertRedirect(route('verification.notice'));
+    }
+
+    public function test_database_seeder_creates_repeatable_demo_accounts_and_posts(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $this->seed(DatabaseSeeder::class);
+
+        $this->assertDatabaseCount('users', 3);
+        $this->assertDatabaseCount('posts', 4);
+
+        $writer = User::where('email', 'writer@example.test')->firstOrFail();
+        $pendingWriter = User::where('email', 'pending.writer@example.test')->firstOrFail();
+
+        $this->assertTrue(Hash::check('DemoPass123!', $writer->password));
+        $this->assertTrue($writer->hasVerifiedEmail());
+        $this->assertFalse($pendingWriter->hasVerifiedEmail());
+        $this->assertDatabaseHas('posts', [
+            'title' => 'Imported Article Without Author',
+            'user_id' => null,
+        ]);
     }
 
     public function test_login_and_logout_work(): void

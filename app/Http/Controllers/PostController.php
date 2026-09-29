@@ -2,27 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
-use App\Models\User;
-use GuzzleHttp\Promise\Create;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
 use App\Services\PostService;
-
-use function PHPUnit\Framework\isNull;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-
     protected $postService;
 
     public function __construct(PostService $postService)
     {
         $this->postService = $postService;
     }
-
-
 
     public function index()
     {
@@ -34,12 +26,9 @@ class PostController extends Controller
 
         // collection object
         $postsFromeDB = $this->postService->getAllPosts();
+
         return view('posts.index', ['posts' => $postsFromeDB]);
     }
-
-
-
-
 
     public function show($postId)
     {
@@ -54,22 +43,14 @@ class PostController extends Controller
 
         //$SinglePostFromDB = post::where('id' , $postId)->first(); //==single result
 
-
         //third way
 
         // $SinglePostFromDB = post::where('id' , $postId)->get(); // == collection object
 
-
         // post::where('title', 'php')->frist(); //select * from posts where title = php limit 1
         // post::where('title', 'php')->get(); //select * from posts where title = php
 
-
-
-
-
         // to solve write id not exist there is two way
-
-
 
         // first way
 
@@ -77,34 +58,19 @@ class PostController extends Controller
         //     return to_route('posts.index');
         // }
 
-
         //Second way // when do query do this
 
         // $SinglePostFromDB = post::findorfail($postId);
 
-
-
         $SinglePostFromDB = $this->postService->getPostById($postId);
-
 
         return view('posts.show', ['post' => $SinglePostFromDB]);
     }
 
-
-
-
-    public function create()
+    public function create(): View
     {
-
-        // select * from Users
-        $users = $this->postService->getAllUsers();
-
-
-        return view('posts.create', ['users' => $users]);
+        return view('posts.create');
     }
-
-
-
 
     public function store(PostRequest $request)
     {
@@ -117,28 +83,22 @@ class PostController extends Controller
         $data = $request->validated();
 
         $this->postService->createPost($data); // insert into posts (title,description)
+
         //there second way to insert data in database (search)
         // 3- redirection to posts.index
         return to_route('posts.index');
     }
 
-
-
-
-    public function edit($postId)
+    public function edit(Request $request, $postId): View
     {
-        $users = $this->postService->getAllUsers();
-        $SinglePostFromDB = $this->postService->getPostById($postId);
-        return View('posts.edit', ['users' => $users, 'post' => $SinglePostFromDB]);
+        $post = $request->user()->posts()->findOrFail($postId);
+
+        return view('posts.edit', ['post' => $post]);
     }
 
-
-
-
-
-
-    public function update(PostRequest $request , $postId)
+    public function update(PostRequest $request, $postId)
     {
+        $request->user()->posts()->findOrFail($postId);
         $data = $request->validated();
 
         $this->postService->updatePost($postId, $data);
@@ -146,14 +106,11 @@ class PostController extends Controller
         return to_route('posts.show', parameters: $postId);
     }
 
-
-    public function destroy($postId)
+    public function destroy(Request $request, $postId)
     {
-
-        //1- delete the post in database
+        $request->user()->posts()->findOrFail($postId);
         $this->postService->deletePost($postId);
 
-        //2- redirection to posts.index
         return to_route('posts.index');
     }
 }

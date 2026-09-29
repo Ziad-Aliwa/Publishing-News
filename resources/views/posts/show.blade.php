@@ -13,6 +13,11 @@
                 <p class="card-text">Description: {{$post['description']}}</p>
             </div>
         </div>
+        @auth
+            @if (auth()->user()->hasVerifiedEmail() && $post->user_id === auth()->id())
+                <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary mt-3">Edit post</a>
+            @endif
+        @endauth
         <div class="card mt-4">
             <h5 class="card-header">post creator info</h5>
             <div class="card-body">        

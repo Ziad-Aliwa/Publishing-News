@@ -6,6 +6,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PostRequest extends FormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if (! $this->is('api/*') && $this->user()) {
+            $this->merge(['post_creator' => $this->user()->getKey()]);
+        }
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -21,10 +28,10 @@ class PostRequest extends FormRequest
      */
     public function rules(): array
     {
-        return  [
+        return [
             'title' => ['required', 'min:3'],
             'description' => ['required', 'min:10'],
-            'post_creator' => ['required', 'exists:users,id']
+            'post_creator' => ['required', 'exists:users,id'],
         ];
     }
 
@@ -36,7 +43,7 @@ class PostRequest extends FormRequest
             'description.min' => 'Description must be at least 10 characters',
             'description.required' => 'Description is required',
             'post_creator.required' => 'Post Creator is required',
-            'post_creator.exists' => 'Post Creator not found in DB'
+            'post_creator.exists' => 'Post Creator not found in DB',
         ];
     }
 }

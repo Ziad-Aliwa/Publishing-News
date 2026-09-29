@@ -29,15 +29,6 @@
         <label class="form-label">Description</label>
         <textarea name="description" class="form-control" rows="3">{{old('description')}}</textarea>
         </div>
-        <div class="md-3">
-              <label class="form-label">Post Creator</label>
-              <select name="post_creator" class="form-control">
-                @foreach ($users as $user)
-                <option value="{{$user['id']}}">{{$user['name']}}</option>
-                @endforeach
-              </select>
-        </div>
-        
         <br>
         <button class="btn btn-success">Submit</button>
 

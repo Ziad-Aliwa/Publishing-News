@@ -8,58 +8,66 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-    <title>@yield('title')</title>
+    <title>@yield('title', 'Publishing News')</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body style="background-color: gray">
+<body class="app-body @yield('page_class')">
+    <div class="site-frame">
+        <header class="site-header">
+            <div class="site-header-inner">
+                <a class="brand-lockup" href="{{ route('posts.index') }}" aria-label="Publishing News newsroom">
+                    <span class="brand-mark">PN</span>
+                    <span class="brand-copy">
+                        <strong>Publishing News</strong>
+                        <small>THE OPEN NEWSROOM</small>
+                    </span>
+                </a>
 
+                <button class="nav-toggle navbar-toggler" type="button" data-menu-toggle="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation">
+                    <span>Menu</span>
+                </button>
 
+                <nav class="collapse navbar-collapse site-navigation" id="mainNavigation" aria-label="Main navigation">
+                    <div class="navigation-links">
+                        <a class="navigation-link" href="{{ route('posts.index') }}">Newsroom</a>
+                        @auth
+                            @if (auth()->user()->hasVerifiedEmail())
+                                <a class="navigation-link" href="{{ route('posts.create') }}">Write a story <span aria-hidden="true">+</span></a>
+                            @endif
+                        @endauth
+                    </div>
+                    <div class="navigation-account">
+                        @guest
+                            <a class="navigation-link" href="{{ route('login') }}">Log in</a>
+                            <a class="button button-small" href="{{ route('register') }}">Join the newsroom</a>
+                        @else
+                            <span class="account-name">{{ auth()->user()->name }}</span>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button class="button button-quiet button-small" type="submit">Log out</button>
+                            </form>
+                        @endguest
+                    </div>
+                </nav>
+            </div>
+        </header>
 
+        <main class="page-content">
+            @if (session('status'))
+                <div class="notice notice-success" role="status">{{ session('status') }}</div>
+            @endif
+            @yield('content')
+        </main>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('posts.index') }}">Publishing News</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="mainNavigation">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="{{ route('posts.index') }}">All posts</a></li>
-            @auth
-              @if (auth()->user()->hasVerifiedEmail())
-                <li class="nav-item"><a class="nav-link" href="{{ route('posts.create') }}">Create post</a></li>
-              @endif
-            @endauth
-          </ul>
-          <ul class="navbar-nav align-items-lg-center gap-lg-2">
-            @guest
-              <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Log in</a></li>
-              <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Register</a></li>
-            @else
-              <li class="nav-item"><span class="navbar-text">{{ auth()->user()->name }}</span></li>
-              <li class="nav-item">
-                <form method="POST" action="{{ route('logout') }}">
-                  @csrf
-                  <button class="btn btn-outline-light btn-sm" type="submit">Log out</button>
-                </form>
-              </li>
-            @endguest
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <div class="container mt-4">
-      @if (session('status'))
-        <div class="alert alert-success" role="status">{{ session('status') }}</div>
-      @endif
-        @yield('content')
-
+        <footer class="site-footer">
+            <span>Publishing News <span aria-hidden="true">·</span> Independent voices, carefully published.</span>
+            <a href="{{ route('posts.index') }}">Back to the newsroom</a>
+        </footer>
     </div>
-
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
 </body>
 

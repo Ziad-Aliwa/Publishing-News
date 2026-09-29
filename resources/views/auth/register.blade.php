@@ -1,34 +1,41 @@
 @extends('layouts.app')
 
-@section('title', 'Register')
+@section('title', 'Join the newsroom | Publishing News')
+@section('page_class', 'auth-page')
 
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-md-7 col-lg-5">
-            <h1 class="h3 mb-4">Create your account</h1>
-            <form method="POST" action="{{ route('register') }}">
+    <div class="auth-layout">
+        @include('auth._aside')
+        <section class="auth-panel" aria-labelledby="auth-title">
+            <div class="auth-panel-heading">
+                <p class="eyebrow">A seat at the table</p>
+                <h1 id="auth-title">Join the newsroom.</h1>
+                <p>Bring your point of view. We'll save you a space.</p>
+            </div>
+            <form class="auth-form" method="POST" action="{{ route('register') }}">
                 @csrf
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input id="name" name="name" type="text" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required autofocus autocomplete="name">
-                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="field-group">
+                    <label for="name">Your name</label>
+                    <input id="name" name="name" type="text" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="How should we address you?" required autofocus autocomplete="name">
+                    @error('name') <span class="field-error">{{ $message }}</span> @enderror
                 </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input id="email" name="email" type="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required autocomplete="username">
-                    @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="field-group">
+                    <label for="email">Email address</label>
+                    <input id="email" name="email" type="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="you@example.com" required autocomplete="username">
+                    @error('email') <span class="field-error">{{ $message }}</span> @enderror
                 </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input id="password" name="password" type="password" class="form-control @error('password') is-invalid @enderror" required autocomplete="new-password">
-                    @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="field-group">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" class="form-control @error('password') is-invalid @enderror" placeholder="At least 8 characters" required autocomplete="new-password">
+                    @error('password') <span class="field-error">{{ $message }}</span> @enderror
                 </div>
-                <div class="mb-3">
-                    <label for="password_confirmation" class="form-label">Confirm password</label>
-                    <input id="password_confirmation" name="password_confirmation" type="password" class="form-control" required autocomplete="new-password">
+                <div class="field-group">
+                    <label for="password_confirmation">Confirm password</label>
+                    <input id="password_confirmation" name="password_confirmation" type="password" class="form-control" placeholder="Enter it once more" required autocomplete="new-password">
                 </div>
-                <button class="btn btn-success" type="submit">Register</button>
+                <button class="button button-wide" type="submit">Create my account <span aria-hidden="true">↗</span></button>
             </form>
-        </div>
+            <p class="auth-switch">Already a member? <a href="{{ route('login') }}">Log in</a></p>
+        </section>
     </div>
 @endsection

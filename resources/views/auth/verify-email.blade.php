@@ -1,16 +1,28 @@
 @extends('layouts.app')
 
-@section('title', 'Verify email')
+@section('title', 'Verify your email | Publishing News')
+@section('page_class', 'auth-page')
 
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <h1 class="h3 mb-3">Verify your email address</h1>
-            <p>Use the verification link sent to your email address before publishing or managing posts.</p>
-            <form method="POST" action="{{ route('verification.send') }}">
+    <div class="auth-layout">
+        @include('auth._aside')
+        <section class="auth-panel" aria-labelledby="auth-title">
+            <div class="auth-panel-heading">
+                <p class="eyebrow">One last step</p>
+                <h1 id="auth-title">Check your inbox.</h1>
+                <p>Follow the verification link we sent to <strong>{{ auth()->user()->email }}</strong>. Once you're verified, your desk is ready.</p>
+            </div>
+            <form class="auth-form" method="POST" action="{{ route('verification.send') }}">
                 @csrf
-                <button class="btn btn-primary" type="submit">Resend verification email</button>
+                <button class="button button-wide" type="submit">Resend verification link <span aria-hidden="true">↗</span></button>
             </form>
-        </div>
+            <div class="auth-logout-row">
+                <span>Wrong account?</span>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button class="text-link" type="submit">Log out</button>
+                </form>
+            </div>
+        </section>
     </div>
 @endsection

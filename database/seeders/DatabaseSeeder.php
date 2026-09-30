@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -40,7 +41,7 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
-        $writer->posts()->updateOrCreate(
+        $welcomePost = $writer->posts()->updateOrCreate(
             ['title' => 'Welcome to Publishing News'],
             ['description' => 'A sample article for testing the public listing and detail page.'],
         );
@@ -61,6 +62,33 @@ class DatabaseSeeder extends Seeder
                 'description' => 'This sample has no author to exercise the unassigned post display.',
                 'user_id' => null,
             ],
+        );
+
+        $firstComment = Comment::updateOrCreate(
+            [
+                'post_id' => $welcomePost->id,
+                'user_id' => $secondWriter->id,
+                'parent_id' => null,
+                'body' => 'A thoughtful conversation makes every story better.',
+            ],
+        );
+
+        $firstComment->replies()->updateOrCreate(
+            [
+                'post_id' => $welcomePost->id,
+                'user_id' => $writer->id,
+                'body' => 'Agreed. Thanks for adding your perspective.',
+            ],
+        );
+
+        $welcomePost->reactions()->updateOrCreate(
+            ['user_id' => $writer->id],
+            ['reaction' => 'like'],
+        );
+
+        $welcomePost->reactions()->updateOrCreate(
+            ['user_id' => $secondWriter->id],
+            ['reaction' => 'dislike'],
         );
     }
 }

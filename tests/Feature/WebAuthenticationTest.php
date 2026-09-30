@@ -46,6 +46,8 @@ class WebAuthenticationTest extends TestCase
 
         $this->assertDatabaseCount('users', 3);
         $this->assertDatabaseCount('posts', 4);
+        $this->assertDatabaseCount('comments', 2);
+        $this->assertDatabaseCount('post_reactions', 2);
 
         $writer = User::where('email', 'writer@example.test')->firstOrFail();
         $pendingWriter = User::where('email', 'pending.writer@example.test')->firstOrFail();

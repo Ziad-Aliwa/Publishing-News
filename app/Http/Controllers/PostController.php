@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
+use App\Models\Post;
 use App\Services\PostService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -25,7 +26,15 @@ class PostController extends Controller
         // Query = selcte * from posts
 
         // collection object
-        $postsFromeDB = $this->postService->getAllPosts();
+        $postsFromeDB = Post::query()
+            ->with('user')
+            ->withCount([
+                'comments',
+                'reactions as likes_count' => fn ($query) => $query->where('reaction', 'like'),
+                'reactions as dislikes_count' => fn ($query) => $query->where('reaction', 'dislike'),
+            ])
+            ->with(['reactions' => fn ($query) => $query->where('user_id', auth()->id() ?? 0)])
+            ->get();
 
         return view('posts.index', ['posts' => $postsFromeDB]);
     }
@@ -63,6 +72,14 @@ class PostController extends Controller
         // $SinglePostFromDB = post::findorfail($postId);
 
         $SinglePostFromDB = $this->postService->getPostById($postId);
+        $SinglePostFromDB->load([
+            'comments' => fn ($query) => $query
+                ->whereNull('parent_id')
+                ->with(['user', 'replies.user'])
+                ->withCount('replies')
+                ->oldest(),
+        ]);
+        $SinglePostFromDB->loadCount('comments');
 
         return view('posts.show', ['post' => $SinglePostFromDB]);
     }

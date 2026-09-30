@@ -48,6 +48,34 @@
                             </div>
                             <h3><a href="{{ route('posts.show', $post->id) }}">{{ $post->title }}</a></h3>
                             <p class="story-excerpt">{{ \Illuminate\Support\Str::limit($post->description, 180) }}</p>
+                            <div class="feed-interactions" aria-label="Story interactions">
+                                @auth
+                                    @if (auth()->user()->hasVerifiedEmail())
+                                        <form class="reaction-form" method="POST" action="{{ route('posts.reaction', $post->id) }}">
+                                            @csrf
+                                            <button class="reaction-button reaction-like {{ $post->reactions->first()?->reaction === 'like' ? 'is-selected' : '' }}" type="submit" name="reaction" value="like" aria-pressed="{{ $post->reactions->first()?->reaction === 'like' ? 'true' : 'false' }}">
+                                                <span class="reaction-symbol" aria-hidden="true">↑</span> Like <span class="reaction-count">{{ $post->likes_count }}</span>
+                                            </button>
+                                            <button class="reaction-button reaction-dislike {{ $post->reactions->first()?->reaction === 'dislike' ? 'is-selected' : '' }}" type="submit" name="reaction" value="dislike" aria-pressed="{{ $post->reactions->first()?->reaction === 'dislike' ? 'true' : 'false' }}">
+                                                <span class="reaction-symbol" aria-hidden="true">↓</span> Dislike <span class="reaction-count">{{ $post->dislikes_count }}</span>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <div class="reaction-form">
+                                            <a class="reaction-button reaction-like" href="{{ route('verification.notice') }}"><span class="reaction-symbol" aria-hidden="true">↑</span> Like <span class="reaction-count">{{ $post->likes_count }}</span></a>
+                                            <a class="reaction-button reaction-dislike" href="{{ route('verification.notice') }}"><span class="reaction-symbol" aria-hidden="true">↓</span> Dislike <span class="reaction-count">{{ $post->dislikes_count }}</span></a>
+                                        </div>
+                                    @endif
+                                @else
+                                    <div class="reaction-form">
+                                        <a class="reaction-button reaction-like" href="{{ route('login') }}"><span class="reaction-symbol" aria-hidden="true">↑</span> Like <span class="reaction-count">{{ $post->likes_count }}</span></a>
+                                        <a class="reaction-button reaction-dislike" href="{{ route('login') }}"><span class="reaction-symbol" aria-hidden="true">↓</span> Dislike <span class="reaction-count">{{ $post->dislikes_count }}</span></a>
+                                    </div>
+                                @endauth
+                                <a class="feed-comments-link" href="{{ route('posts.show', $post->id) }}#comments" aria-label="View {{ $post->comments_count }} comments on {{ $post->title }}">
+                                    <span class="comment-icon" aria-hidden="true"></span> Comments <span class="reaction-count">{{ $post->comments_count }}</span>
+                                </a>
+                            </div>
                             <div class="story-actions">
                                 <a class="text-link" href="{{ route('posts.show', $post->id) }}">Read story <span aria-hidden="true">↗</span></a>
                                 @auth

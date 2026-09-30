@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostInteractionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,6 +48,10 @@ Route::post('/email/verification-notification', [EmailVerificationController::cl
 Route::get('/posts', [PostController::class, 'index'])->name(name: 'posts.index');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/posts/{post}/reaction', [PostInteractionController::class, 'react'])->name('posts.reaction');
+    Route::post('/posts/{post}/comments', [PostInteractionController::class, 'storeComment'])->name('posts.comments.store');
+    Route::delete('/posts/{post}/comments/{comment}', [PostInteractionController::class, 'destroyComment'])->name('posts.comments.destroy');
+
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');

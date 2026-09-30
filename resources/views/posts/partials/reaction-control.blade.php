@@ -4,7 +4,8 @@
     $reactionTarget = $canReact
         ? route('posts.reaction', $post->id)
         : (auth()->check() ? route('verification.notice') : route('login'));
-    $accessMessage = auth()->check() ? 'Verify your email to ' : 'Log in to ';
+    $accessMessage = auth()->check() ? __('Verify your email to') : __('Log in to');
+    $reactionLabels = ['like' => __('Like'), 'dislike' => __('Dislike')];
 @endphp
 
 <div class="vote-shell">
@@ -12,7 +13,7 @@
         <form class="reaction-form interaction-votes" method="POST" action="{{ $reactionTarget }}" data-async-form="reaction">
             @csrf
             @foreach (['like' => $post->likes_count, 'dislike' => $post->dislikes_count] as $reaction => $count)
-                <button class="vote-button reaction-{{ $reaction }} {{ $viewerReaction === $reaction ? 'is-selected' : '' }}" type="submit" name="reaction" value="{{ $reaction }}" aria-label="{{ ucfirst($reaction) }}, {{ $count }}" aria-pressed="{{ $viewerReaction === $reaction ? 'true' : 'false' }}" data-tooltip="{{ ucfirst($reaction) }}">
+                <button class="vote-button reaction-{{ $reaction }} {{ $viewerReaction === $reaction ? 'is-selected' : '' }}" type="submit" name="reaction" value="{{ $reaction }}" aria-label="{{ __(':reaction, :count', ['reaction' => $reactionLabels[$reaction], 'count' => $count]) }}" aria-pressed="{{ $viewerReaction === $reaction ? 'true' : 'false' }}" data-tooltip="{{ $reactionLabels[$reaction] }}" data-reaction-label="{{ $reactionLabels[$reaction] }}" data-label-template="{{ __(':reaction, :count') }}">
                     @include('posts.partials.reaction-icon', ['type' => $reaction])
                     <span class="reaction-count">{{ $count }}</span>
                 </button>
@@ -21,7 +22,7 @@
     @else
         <div class="interaction-votes">
             @foreach (['like' => $post->likes_count, 'dislike' => $post->dislikes_count] as $reaction => $count)
-                <a class="vote-button reaction-{{ $reaction }}" href="{{ $reactionTarget }}" aria-label="{{ $accessMessage.$reaction }}, {{ $count }}" data-tooltip="{{ ucfirst($reaction) }}">
+                <a class="vote-button reaction-{{ $reaction }}" href="{{ $reactionTarget }}" aria-label="{{ __(':message :reaction, :count', ['message' => $accessMessage, 'reaction' => $reactionLabels[$reaction], 'count' => $count]) }}" data-tooltip="{{ $reactionLabels[$reaction] }}">
                     @include('posts.partials.reaction-icon', ['type' => $reaction])
                     <span class="reaction-count">{{ $count }}</span>
                 </a>

@@ -34,7 +34,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect()->route('verification.notice')
-            ->with('status', 'Your account was created. Verify your email to publish posts.');
+            ->with('status', __('Your account was created. Verify your email to publish posts.'));
     }
 
     public function showLogin(): View
@@ -53,8 +53,9 @@ class AuthController extends Controller
 
         if ($limiter->tooManyAttempts($key, 5)) {
             throw ValidationException::withMessages([
-                'email' => 'Too many login attempts. Please try again in '.
-                    $limiter->availableIn($key).' seconds.',
+                'email' => __('Too many login attempts. Please try again in :seconds seconds.', [
+                    'seconds' => $limiter->availableIn($key),
+                ]),
             ]);
         }
 
@@ -62,7 +63,7 @@ class AuthController extends Controller
             $limiter->hit($key, 60);
 
             throw ValidationException::withMessages([
-                'email' => 'These credentials do not match our records.',
+                'email' => __('These credentials do not match our records.'),
             ]);
         }
 

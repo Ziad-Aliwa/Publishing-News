@@ -38,12 +38,12 @@ class PostRequest extends FormRequest
     public function messages()
     {
         return [
-            'title.required' => 'Title is required',
-            'title.min' => 'Title must be at least 3 characters',
-            'description.min' => 'Description must be at least 10 characters',
-            'description.required' => 'Description is required',
-            'post_creator.required' => 'Post Creator is required',
-            'post_creator.exists' => 'Post Creator not found in DB',
+            'title.required' => __('The title field is required.'),
+            'title.min' => __('The title must be at least 3 characters.'),
+            'description.min' => __('The description must be at least 10 characters.'),
+            'description.required' => __('The description field is required.'),
+            'post_creator.required' => __('The post creator field is required.'),
+            'post_creator.exists' => __('The selected post creator is invalid.'),
         ];
     }
 }

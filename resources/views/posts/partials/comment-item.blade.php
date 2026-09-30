@@ -14,22 +14,22 @@
                 @auth
                     @if (auth()->user()->hasVerifiedEmail())
                         <details class="reply-disclosure">
-                            <summary class="reply-trigger"><span class="reply-icon" aria-hidden="true">↩</span> Reply</summary>
+                            <summary class="reply-trigger"><span class="reply-icon" aria-hidden="true">↩</span> {{ __('Reply') }}</summary>
                             <form class="reply-composer" method="POST" action="{{ route('posts.comments.store', $post->id) }}" data-async-form="comment">
                                 @csrf
                                 <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-                                <label class="visually-hidden" for="reply-{{ $comment->id }}">Reply to {{ $comment->user->name }}</label>
-                                <textarea id="reply-{{ $comment->id }}" name="body" rows="2" maxlength="5000" placeholder="Write a reply..." required></textarea>
+                                <label class="visually-hidden" for="reply-{{ $comment->id }}">{{ __('Reply to :name', ['name' => $comment->user->name]) }}</label>
+                                <textarea id="reply-{{ $comment->id }}" name="body" rows="2" maxlength="5000" placeholder="{{ __('Write a reply...') }}" required></textarea>
                                 <span class="async-feedback" aria-live="polite"></span>
-                                <button class="button button-small" type="submit">Send reply</button>
+                                <button class="button button-small" type="submit">{{ __('Send reply') }}</button>
                             </form>
                         </details>
                     @endif
                     @if (auth()->id() === $comment->user_id || auth()->id() === $post->user_id)
-                        <form method="POST" action="{{ route('posts.comments.destroy', [$post->id, $comment->id]) }}" data-async-form="delete-comment" onsubmit="return confirm('Delete this comment and its replies?')">
+                        <form method="POST" action="{{ route('posts.comments.destroy', [$post->id, $comment->id]) }}" data-async-form="delete-comment" onsubmit="return confirm(@js(__('Delete this comment and its replies?')))">
                             @csrf
                             @method('DELETE')
-                            <button class="text-link text-link-danger" type="submit">Delete</button>
+                            <button class="text-link text-link-danger" type="submit">{{ __('Delete') }}</button>
                         </form>
                     @endif
                 @endauth
@@ -45,10 +45,10 @@
         @else
             @auth
                 @if (auth()->id() === $comment->user_id || auth()->id() === $post->user_id)
-                    <form method="POST" action="{{ route('posts.comments.destroy', [$post->id, $comment->id]) }}" data-async-form="delete-comment" onsubmit="return confirm('Delete this reply?')">
+                    <form method="POST" action="{{ route('posts.comments.destroy', [$post->id, $comment->id]) }}" data-async-form="delete-comment" onsubmit="return confirm(@js(__('Delete this reply?')))">
                         @csrf
                         @method('DELETE')
-                        <button class="text-link text-link-danger" type="submit">Delete</button>
+                        <button class="text-link text-link-danger" type="submit">{{ __('Delete') }}</button>
                     </form>
                 @endif
             @endauth

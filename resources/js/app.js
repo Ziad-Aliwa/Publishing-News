@@ -15,6 +15,14 @@ document.querySelectorAll('[data-menu-toggle]').forEach((toggle) => {
 	});
 });
 
+document.querySelectorAll('[data-language-toggle]').forEach((toggle) => {
+	toggle.addEventListener('change', () => {
+		const form = toggle.closest('[data-language-form]');
+		form.querySelector('input[name="locale"]').value = toggle.checked ? 'en' : 'ar';
+		form.requestSubmit();
+	});
+});
+
 const setFeedback = (form, message, isError = false) => {
 	const feedback = form.querySelector('.async-feedback');
 
@@ -38,7 +46,7 @@ const sendJsonRequest = async (url, options = {}) => {
 	if (!response.ok) {
 		const message = Object.values(payload.errors ?? {}).flat()[0]
 			?? payload.message
-			?? 'Something went wrong. Please try again.';
+			?? document.body.dataset.asyncError;
 
 		throw new Error(message);
 	}
@@ -52,7 +60,10 @@ const updateCommentCount = (postId, count) => {
 		const toggle = counter.closest('[data-comments-toggle]');
 
 		if (toggle) {
-			toggle.setAttribute('aria-label', `Open ${count} comments on ${toggle.dataset.postTitle}`);
+			const label = toggle.dataset.commentsLabel
+				.replace(':count', count)
+				.replace(':title', toggle.dataset.postTitle);
+			toggle.setAttribute('aria-label', label);
 		}
 	});
 };
@@ -139,7 +150,9 @@ document.addEventListener('submit', async (event) => {
 
 					button.classList.toggle('is-selected', selected);
 					button.setAttribute('aria-pressed', String(selected));
-					button.setAttribute('aria-label', `${reaction === 'like' ? 'Like' : 'Dislike'}, ${count}`);
+					button.setAttribute('aria-label', button.dataset.labelTemplate
+						.replace(':reaction', button.dataset.reactionLabel)
+						.replace(':count', count));
 					button.querySelector('.reaction-count').textContent = count;
 				});
 
@@ -186,7 +199,10 @@ document.addEventListener('submit', async (event) => {
 			updateCommentCount(postId, payload.comments_count);
 
 			if (payload.comments_count === 0) {
-				thread.querySelector('[data-comment-list]').innerHTML = '<p class="comments-empty">No comments yet. Start a thoughtful conversation.</p>';
+				const emptyMessage = document.createElement('p');
+				emptyMessage.className = 'comments-empty';
+				emptyMessage.textContent = document.body.dataset.emptyCommentsText;
+				thread.querySelector('[data-comment-list]').replaceChildren(emptyMessage);
 			}
 		}
 	} catch (error) {

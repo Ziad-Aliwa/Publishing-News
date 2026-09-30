@@ -27,7 +27,7 @@ class PostInteractionController extends Controller
                 return $this->reactionResponse($request, $post);
             }
 
-            return back()->with('status', 'Your reaction was removed.');
+            return back()->with('status', __('Your reaction was removed.'));
         }
 
         $post->reactions()->updateOrCreate(
@@ -39,7 +39,7 @@ class PostInteractionController extends Controller
             return $this->reactionResponse($request, $post);
         }
 
-        return back()->with('status', 'Your reaction was recorded.');
+        return back()->with('status', __('Your reaction was recorded.'));
     }
 
     public function comments(Post $post): JsonResponse
@@ -91,11 +91,11 @@ class PostInteractionController extends Controller
                 ])->render(),
                 'parent_id' => $comment->parent_id,
                 'comments_count' => $post->comments()->count(),
-                'message' => $comment->parent_id ? 'Reply added.' : 'Comment added.',
+                'message' => $comment->parent_id ? __('Reply added.') : __('Comment added.'),
             ], 201);
         }
 
-        return back()->with('status', isset($validated['parent_id']) ? 'Your reply was added.' : 'Your comment was added.');
+        return back()->with('status', isset($validated['parent_id']) ? __('Your reply was added.') : __('Your comment was added.'));
     }
 
     public function destroyComment(Request $request, Post $post, Comment $comment): JsonResponse|RedirectResponse
@@ -114,11 +114,11 @@ class PostInteractionController extends Controller
             return response()->json([
                 'deleted_comment_ids' => $deletedCommentIds,
                 'comments_count' => $post->comments()->count(),
-                'message' => 'Comment deleted.',
+                'message' => __('Comment deleted.'),
             ]);
         }
 
-        return back()->with('status', 'The comment and its replies were deleted.');
+        return back()->with('status', __('The comment and its replies were deleted.'));
     }
 
     private function reactionResponse(Request $request, Post $post): JsonResponse

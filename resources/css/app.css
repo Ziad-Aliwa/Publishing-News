@@ -164,6 +164,85 @@ p {
 	gap: 24px;
 }
 
+.language-switch {
+	margin: 0;
+	flex: 0 0 auto;
+}
+
+.language-switch .toggle > div {
+	position: relative;
+	width: 66px;
+	height: 36px;
+	padding: 4px;
+	border: 1px solid rgba(72, 101, 90, 0.16);
+	border-radius: 999px;
+	background: linear-gradient(145deg, rgba(222, 231, 226, 0.9), rgba(255, 255, 255, 0.92));
+	box-shadow: inset 0 1px 3px rgba(38, 58, 53, 0.1), 0 2px 6px rgba(38, 58, 53, 0.06);
+}
+
+.language-switch .toggle input {
+	position: absolute;
+	z-index: 2;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.language-switch .toggle > div > div {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	border-radius: 999px;
+	color: var(--moss-dark);
+	background: linear-gradient(90deg, rgba(228, 238, 232, 0.98) 48%, rgba(255, 255, 255, 0.96) 52%);
+	transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.language-switch .toggle > div > div::before,
+.language-switch .toggle > div > div::after {
+	position: absolute;
+	top: 50%;
+	width: 50%;
+	color: var(--muted);
+	font-size: 9px;
+	font-weight: 700;
+	line-height: 1;
+	text-align: center;
+	transform: translateY(-50%);
+	transition: color 180ms ease;
+}
+
+.language-switch .toggle > div > div::before {
+	left: 0;
+	color: var(--moss-dark);
+	content: attr(data-unchecked);
+}
+
+.language-switch .toggle > div > div::after {
+	right: 0;
+	content: attr(data-checked);
+}
+
+.language-switch .toggle input:checked ~ div {
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0.96) 48%, rgba(228, 238, 232, 0.98) 52%);
+}
+
+.language-switch .toggle input:checked ~ div::before {
+	color: var(--muted);
+}
+
+.language-switch .toggle input:checked ~ div::after {
+	color: var(--moss-dark);
+}
+
+.language-switch .toggle input:focus-visible ~ div {
+	outline: 3px solid rgba(88, 119, 108, 0.36);
+	outline-offset: 3px;
+}
+
 .navigation-links,
 .navigation-account {
 	gap: 25px;
@@ -2070,4 +2149,30 @@ textarea.form-control {
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;
 	}
+}
+
+html[dir="rtl"] body {
+	font-family: "Noto Sans Arabic", var(--sans);
+}
+
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3,
+html[dir="rtl"] .article-body p {
+	font-family: "Noto Naskh Arabic", var(--display);
+}
+
+html[dir="rtl"] .reply-list {
+	margin-right: 4px;
+	margin-left: 0;
+	padding-right: 15px;
+	padding-left: 0;
+	border-right: 1px solid rgba(88, 119, 108, 0.2);
+	border-left: 0;
+}
+
+html[dir="rtl"] .back-link > span,
+html[dir="rtl"] .button > span[aria-hidden="true"],
+html[dir="rtl"] .story-arrow {
+	transform: scaleX(-1);
 }

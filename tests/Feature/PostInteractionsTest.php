@@ -43,8 +43,8 @@ class PostInteractionsTest extends TestCase
 
         $this->get(route('posts.index'))
             ->assertOk()
-            ->assertSee('Like')
-            ->assertSee('Dislike');
+            ->assertSee('data-tooltip="Like"', false)
+            ->assertSee('data-tooltip="Dislike"', false);
 
         $this->get(route('posts.show', $post))
             ->assertOk()
@@ -217,8 +217,8 @@ class PostInteractionsTest extends TestCase
 
         $this->get(route('posts.index'))
             ->assertOk()
-            ->assertSee('Like')
-            ->assertSee('Dislike')
+            ->assertSee('data-tooltip="Like"', false)
+            ->assertSee('data-tooltip="Dislike"', false)
             ->assertSee(route('posts.comments.index', $post->id), false)
             ->assertSee('data-comments-toggle', false);
 

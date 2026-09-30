@@ -26,7 +26,7 @@ class EmailVerificationController extends Controller
             event(new Verified($request->user()));
         }
 
-        return redirect()->route('posts.index')->with('status', 'Your email address has been verified.');
+        return redirect()->route('posts.index')->with('status', __('Your email address has been verified.'));
     }
 
     public function resend(Request $request): RedirectResponse
@@ -37,6 +37,6 @@ class EmailVerificationController extends Controller
 
         $request->user()->sendEmailVerificationNotification();
 
-        return back()->with('status', 'A new verification link has been sent to your email address.');
+        return back()->with('status', __('A new verification link has been sent to your email address.'));
     }
 }

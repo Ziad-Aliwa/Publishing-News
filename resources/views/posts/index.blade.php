@@ -51,7 +51,7 @@
                             <div class="feed-interactions" aria-label="Story interactions">
                                 @auth
                                     @if (auth()->user()->hasVerifiedEmail())
-                                        <form class="reaction-form" method="POST" action="{{ route('posts.reaction', $post->id) }}">
+                                        <form class="reaction-form" method="POST" action="{{ route('posts.reaction', $post->id) }}" data-async-form="reaction">
                                             @csrf
                                             <button class="reaction-button reaction-like {{ $post->reactions->first()?->reaction === 'like' ? 'is-selected' : '' }}" type="submit" name="reaction" value="like" aria-pressed="{{ $post->reactions->first()?->reaction === 'like' ? 'true' : 'false' }}">
                                                 <span class="reaction-symbol" aria-hidden="true">↑</span> Like <span class="reaction-count">{{ $post->likes_count }}</span>
@@ -72,10 +72,11 @@
                                         <a class="reaction-button reaction-dislike" href="{{ route('login') }}"><span class="reaction-symbol" aria-hidden="true">↓</span> Dislike <span class="reaction-count">{{ $post->dislikes_count }}</span></a>
                                     </div>
                                 @endauth
-                                <a class="feed-comments-link" href="{{ route('posts.show', $post->id) }}#comments" aria-label="View {{ $post->comments_count }} comments on {{ $post->title }}">
-                                    <span class="comment-icon" aria-hidden="true"></span> Comments <span class="reaction-count">{{ $post->comments_count }}</span>
-                                </a>
+                                <button class="feed-comments-link" type="button" data-comments-toggle data-comments-url="{{ route('posts.comments.index', $post->id) }}" aria-expanded="false" aria-controls="post-comments-{{ $post->id }}">
+                                    <span class="comment-icon" aria-hidden="true"></span> Comments <span class="reaction-count" data-post-comment-count="{{ $post->id }}">{{ $post->comments_count }}</span>
+                                </button>
                             </div>
+                            <div class="feed-comments-panel" id="post-comments-{{ $post->id }}" hidden></div>
                             <div class="story-actions">
                                 <a class="text-link" href="{{ route('posts.show', $post->id) }}">Read story <span aria-hidden="true">↗</span></a>
                                 @auth

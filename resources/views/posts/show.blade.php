@@ -31,21 +31,22 @@
                     @endif
                 @endauth
 
-                <section id="comments" class="comments-section" aria-labelledby="comments-title">
+                <section id="comments" class="comments-section" data-comments-thread data-post-id="{{ $post->id }}" aria-labelledby="comments-title">
                     <div class="comments-heading">
                         <div>
                             <span class="eyebrow">Around the table</span>
-                            <h2 id="comments-title">Conversation <span>{{ $post->comments_count }}</span></h2>
+                            <h2 id="comments-title">Conversation <span data-comments-count>{{ $post->comments_count }}</span></h2>
                         </div>
                     </div>
 
                     @auth
                         @if (auth()->user()->hasVerifiedEmail())
-                            <form class="comment-composer" method="POST" action="{{ route('posts.comments.store', $post->id) }}">
+                            <form class="comment-composer" method="POST" action="{{ route('posts.comments.store', $post->id) }}" data-async-form="comment">
                                 @csrf
                                 <label class="visually-hidden" for="new-comment">Add your comment</label>
                                 <textarea id="new-comment" name="body" rows="3" maxlength="5000" placeholder="Add something thoughtful to the conversation..." required>{{ old('body') }}</textarea>
                                 @error('body') <span class="field-error">{{ $message }}</span> @enderror
+                                <span class="async-feedback" aria-live="polite"></span>
                                 <div class="composer-footer">
                                     <span>Keep it kind and on topic.</span>
                                     <button class="button button-small" type="submit">Add comment <span aria-hidden="true">↗</span></button>
@@ -58,9 +59,9 @@
                         <div class="comment-signin-note">Have a thought to add? <a href="{{ route('login') }}">Log in to comment <span aria-hidden="true">↗</span></a></div>
                     @endauth
 
-                    <div class="comment-list">
+                    <div class="comment-list" data-comment-list>
                         @forelse ($post->comments as $comment)
-                            <article class="comment-item">
+                            <article class="comment-item" data-comment-id="{{ $comment->id }}">
                                 <div class="comment-avatar">{{ strtoupper(substr($comment->user->name, 0, 1)) }}</div>
                                 <div class="comment-content">
                                     <div class="comment-meta"><strong>{{ $comment->user->name }}</strong><time datetime="{{ $comment->created_at->toIso8601String() }}">{{ $comment->created_at->diffForHumans() }}</time></div>
@@ -70,18 +71,19 @@
                                             @if (auth()->user()->hasVerifiedEmail())
                                                 <details class="reply-disclosure">
                                                     <summary class="reply-trigger"><span class="reply-icon" aria-hidden="true">↩</span> Reply</summary>
-                                                    <form class="reply-composer" method="POST" action="{{ route('posts.comments.store', $post->id) }}">
+                                                    <form class="reply-composer" method="POST" action="{{ route('posts.comments.store', $post->id) }}" data-async-form="comment">
                                                         @csrf
                                                         <input type="hidden" name="parent_id" value="{{ $comment->id }}">
                                                         <label class="visually-hidden" for="reply-{{ $comment->id }}">Reply to {{ $comment->user->name }}</label>
                                                         <textarea id="reply-{{ $comment->id }}" name="body" rows="2" maxlength="5000" placeholder="Write a reply..." required>{{ old('parent_id') == $comment->id ? old('body') : '' }}</textarea>
                                                         @error('parent_id') <span class="field-error">{{ $message }}</span> @enderror
+                                                        <span class="async-feedback" aria-live="polite"></span>
                                                         <button class="button button-small" type="submit">Send reply</button>
                                                     </form>
                                                 </details>
                                             @endif
                                             @if (auth()->id() === $comment->user_id || auth()->id() === $post->user_id)
-                                                <form method="POST" action="{{ route('posts.comments.destroy', [$post->id, $comment->id]) }}" onsubmit="return confirm('Delete this comment and its replies?')">
+                                                <form method="POST" action="{{ route('posts.comments.destroy', [$post->id, $comment->id]) }}" data-async-form="delete-comment" onsubmit="return confirm('Delete this comment and its replies?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="text-link text-link-danger" type="submit">Delete</button>
@@ -93,14 +95,14 @@
                                     @if ($comment->replies->isNotEmpty())
                                         <div class="reply-list">
                                             @foreach ($comment->replies as $reply)
-                                                <article class="comment-item reply-item">
+                                                <article class="comment-item reply-item" data-comment-id="{{ $reply->id }}">
                                                     <div class="comment-avatar">{{ strtoupper(substr($reply->user->name, 0, 1)) }}</div>
                                                     <div class="comment-content">
                                                         <div class="comment-meta"><strong>{{ $reply->user->name }}</strong><time datetime="{{ $reply->created_at->toIso8601String() }}">{{ $reply->created_at->diffForHumans() }}</time></div>
                                                         <p class="comment-body">{{ $reply->body }}</p>
                                                         @auth
                                                             @if (auth()->id() === $reply->user_id || auth()->id() === $post->user_id)
-                                                                <form method="POST" action="{{ route('posts.comments.destroy', [$post->id, $reply->id]) }}" onsubmit="return confirm('Delete this reply?')">
+                                                                <form method="POST" action="{{ route('posts.comments.destroy', [$post->id, $reply->id]) }}" data-async-form="delete-comment" onsubmit="return confirm('Delete this reply?')">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button class="text-link text-link-danger" type="submit">Delete</button>

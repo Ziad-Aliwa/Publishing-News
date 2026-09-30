@@ -46,6 +46,7 @@ Route::post('/email/verification-notification', [EmailVerificationController::cl
 // route name help to (DRY)
 
 Route::get('/posts', [PostController::class, 'index'])->name(name: 'posts.index');
+Route::get('/posts/{post}/comments', [PostInteractionController::class, 'comments'])->name('posts.comments.index');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/posts/{post}/reaction', [PostInteractionController::class, 'react'])->name('posts.reaction');

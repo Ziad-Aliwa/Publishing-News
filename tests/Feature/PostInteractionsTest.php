@@ -51,6 +51,50 @@ class PostInteractionsTest extends TestCase
             ->assertDontSee('post-reactions');
     }
 
+    public function test_ajax_requests_return_json_for_reactions_comments_replies_and_deletion(): void
+    {
+        $owner = User::factory()->create();
+        $commenter = User::factory()->create();
+        $post = $this->createPost($owner);
+
+        $this->actingAs($commenter)
+            ->postJson(route('posts.reaction', $post), ['reaction' => 'like'])
+            ->assertOk()
+            ->assertJson([
+                'likes_count' => 1,
+                'dislikes_count' => 0,
+                'viewer_reaction' => 'like',
+            ]);
+
+        $this->actingAs($commenter)
+            ->getJson(route('posts.comments.index', $post))
+            ->assertOk()
+            ->assertJsonPath('html', fn (string $html) => str_contains($html, 'data-comment-list'));
+
+        $commentResponse = $this->actingAs($commenter)
+            ->postJson(route('posts.comments.store', $post), ['body' => 'An AJAX comment.'])
+            ->assertCreated()
+            ->assertJsonPath('parent_id', null)
+            ->assertJsonPath('comments_count', 1);
+
+        $comment = Comment::where('body', 'An AJAX comment.')->firstOrFail();
+
+        $this->actingAs($commenter)
+            ->postJson(route('posts.comments.store', $post), [
+                'body' => 'An AJAX reply.',
+                'parent_id' => $comment->id,
+            ])
+            ->assertCreated()
+            ->assertJsonPath('parent_id', $comment->id)
+            ->assertJsonPath('comments_count', 2);
+
+        $this->actingAs($owner)
+            ->deleteJson(route('posts.comments.destroy', [$post, $comment]))
+            ->assertOk()
+            ->assertJsonPath('comments_count', 0)
+            ->assertJsonCount(2, 'deleted_comment_ids');
+    }
+
     public function test_users_can_comment_and_reply_only_to_top_level_comments_on_the_same_post(): void
     {
         $post = $this->createPost();
@@ -164,7 +208,7 @@ class PostInteractionsTest extends TestCase
             ->assertRedirect(route('verification.notice'));
     }
 
-    public function test_newsroom_shows_reaction_buttons_and_comment_link_for_each_post(): void
+    public function test_newsroom_shows_reaction_buttons_and_inline_comments_control_for_each_post(): void
     {
         $post = $this->createPost();
         $user = User::factory()->create();
@@ -173,7 +217,8 @@ class PostInteractionsTest extends TestCase
             ->assertOk()
             ->assertSee('Like')
             ->assertSee('Dislike')
-            ->assertSee(route('posts.show', $post->id).'#comments', false);
+            ->assertSee(route('posts.comments.index', $post->id), false)
+            ->assertSee('data-comments-toggle', false);
 
         $post->reactions()->create(['user_id' => $user->id, 'reaction' => 'like']);
 

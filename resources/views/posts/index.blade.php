@@ -49,31 +49,13 @@
                             <h3><a href="{{ route('posts.show', $post->id) }}">{{ $post->title }}</a></h3>
                             <p class="story-excerpt">{{ \Illuminate\Support\Str::limit($post->description, 180) }}</p>
                             <div class="feed-interactions" aria-label="Story interactions">
-                                @auth
-                                    @if (auth()->user()->hasVerifiedEmail())
-                                        <form class="reaction-form" method="POST" action="{{ route('posts.reaction', $post->id) }}" data-async-form="reaction">
-                                            @csrf
-                                            <button class="reaction-button reaction-like {{ $post->reactions->first()?->reaction === 'like' ? 'is-selected' : '' }}" type="submit" name="reaction" value="like" aria-pressed="{{ $post->reactions->first()?->reaction === 'like' ? 'true' : 'false' }}">
-                                                <span class="reaction-symbol" aria-hidden="true">↑</span> Like <span class="reaction-count">{{ $post->likes_count }}</span>
-                                            </button>
-                                            <button class="reaction-button reaction-dislike {{ $post->reactions->first()?->reaction === 'dislike' ? 'is-selected' : '' }}" type="submit" name="reaction" value="dislike" aria-pressed="{{ $post->reactions->first()?->reaction === 'dislike' ? 'true' : 'false' }}">
-                                                <span class="reaction-symbol" aria-hidden="true">↓</span> Dislike <span class="reaction-count">{{ $post->dislikes_count }}</span>
-                                            </button>
-                                        </form>
-                                    @else
-                                        <div class="reaction-form">
-                                            <a class="reaction-button reaction-like" href="{{ route('verification.notice') }}"><span class="reaction-symbol" aria-hidden="true">↑</span> Like <span class="reaction-count">{{ $post->likes_count }}</span></a>
-                                            <a class="reaction-button reaction-dislike" href="{{ route('verification.notice') }}"><span class="reaction-symbol" aria-hidden="true">↓</span> Dislike <span class="reaction-count">{{ $post->dislikes_count }}</span></a>
-                                        </div>
-                                    @endif
-                                @else
-                                    <div class="reaction-form">
-                                        <a class="reaction-button reaction-like" href="{{ route('login') }}"><span class="reaction-symbol" aria-hidden="true">↑</span> Like <span class="reaction-count">{{ $post->likes_count }}</span></a>
-                                        <a class="reaction-button reaction-dislike" href="{{ route('login') }}"><span class="reaction-symbol" aria-hidden="true">↓</span> Dislike <span class="reaction-count">{{ $post->dislikes_count }}</span></a>
-                                    </div>
-                                @endauth
-                                <button class="feed-comments-link" type="button" data-comments-toggle data-comments-url="{{ route('posts.comments.index', $post->id) }}" aria-expanded="false" aria-controls="post-comments-{{ $post->id }}">
-                                    <span class="comment-icon" aria-hidden="true"></span> Comments <span class="reaction-count" data-post-comment-count="{{ $post->id }}">{{ $post->comments_count }}</span>
+                                @include('posts.partials.reaction-control', ['post' => $post])
+                                <button class="feed-comments-link" type="button" data-comments-toggle data-comments-url="{{ route('posts.comments.index', $post->id) }}" data-post-title="{{ $post->title }}" data-tooltip="Comments" aria-label="Open {{ $post->comments_count }} comments on {{ $post->title }}" aria-expanded="false" aria-controls="post-comments-{{ $post->id }}">
+                                    <svg class="comment-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" aria-hidden="true">
+                                        <path d="M8 9h8M8 13h6"></path>
+                                        <path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h12z"></path>
+                                    </svg>
+                                    <span class="comment-count" data-post-comment-count="{{ $post->id }}">{{ $post->comments_count }}</span>
                                 </button>
                             </div>
                             <div class="feed-comments-panel" id="post-comments-{{ $post->id }}" hidden></div>

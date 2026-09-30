@@ -46,6 +46,17 @@ const sendJsonRequest = async (url, options = {}) => {
 	return payload;
 };
 
+const updateCommentCount = (postId, count) => {
+	document.querySelectorAll(`[data-post-comment-count="${postId}"]`).forEach((counter) => {
+		counter.textContent = count;
+		const toggle = counter.closest('[data-comments-toggle]');
+
+		if (toggle) {
+			toggle.setAttribute('aria-label', `Open ${count} comments on ${toggle.dataset.postTitle}`);
+		}
+	});
+};
+
 document.addEventListener('click', async (event) => {
 	const toggle = event.target.closest('[data-comments-toggle]');
 
@@ -128,6 +139,7 @@ document.addEventListener('submit', async (event) => {
 
 					button.classList.toggle('is-selected', selected);
 					button.setAttribute('aria-pressed', String(selected));
+					button.setAttribute('aria-label', `${reaction === 'like' ? 'Like' : 'Dislike'}, ${count}`);
 					button.querySelector('.reaction-count').textContent = count;
 				});
 
@@ -160,9 +172,7 @@ document.addEventListener('submit', async (event) => {
 
 			form.reset();
 			thread.querySelector('[data-comments-count]').textContent = payload.comments_count;
-			document.querySelectorAll(`[data-post-comment-count="${postId}"]`).forEach((count) => {
-				count.textContent = payload.comments_count;
-			});
+			updateCommentCount(postId, payload.comments_count);
 			setFeedback(form, payload.message);
 			return;
 		}
@@ -173,9 +183,7 @@ document.addEventListener('submit', async (event) => {
 			});
 
 			thread.querySelector('[data-comments-count]').textContent = payload.comments_count;
-			document.querySelectorAll(`[data-post-comment-count="${postId}"]`).forEach((count) => {
-				count.textContent = payload.comments_count;
-			});
+			updateCommentCount(postId, payload.comments_count);
 
 			if (payload.comments_count === 0) {
 				thread.querySelector('[data-comment-list]').innerHTML = '<p class="comments-empty">No comments yet. Start a thoughtful conversation.</p>';

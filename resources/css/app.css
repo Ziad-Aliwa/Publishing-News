@@ -812,6 +812,12 @@ p {
 	white-space: pre-line;
 }
 
+.article-reactions {
+	margin: 0 0 28px;
+	display: flex;
+	align-items: center;
+}
+
 .article-actions,
 .form-actions {
 	display: flex;

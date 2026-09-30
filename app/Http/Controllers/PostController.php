@@ -79,7 +79,14 @@ class PostController extends Controller
                 ->withCount('replies')
                 ->oldest(),
         ]);
-        $SinglePostFromDB->loadCount('comments');
+        $SinglePostFromDB->loadCount([
+            'comments',
+            'reactions as likes_count' => fn ($query) => $query->where('reaction', 'like'),
+            'reactions as dislikes_count' => fn ($query) => $query->where('reaction', 'dislike'),
+        ]);
+        $SinglePostFromDB->load([
+            'reactions' => fn ($query) => $query->where('user_id', auth()->id() ?? 0),
+        ]);
 
         return view('posts.show', ['post' => $SinglePostFromDB]);
     }

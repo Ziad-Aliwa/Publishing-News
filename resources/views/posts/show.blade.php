@@ -18,6 +18,9 @@
                 <div class="article-body">
                     <p>{{ $post->description }}</p>
                 </div>
+                <div class="article-reactions" aria-label="React to this story">
+                    @include('posts.partials.reaction-control', ['post' => $post])
+                </div>
                 @auth
                     @if (auth()->user()->hasVerifiedEmail() && $post->user_id === auth()->id())
                         <div class="article-actions">

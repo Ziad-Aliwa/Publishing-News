@@ -48,7 +48,9 @@ class PostInteractionsTest extends TestCase
 
         $this->get(route('posts.show', $post))
             ->assertOk()
-            ->assertDontSee('post-reactions');
+            ->assertSee('Like')
+            ->assertSee('Dislike')
+            ->assertSee('aria-pressed="true"', false);
     }
 
     public function test_ajax_requests_return_json_for_reactions_comments_replies_and_deletion(): void
@@ -229,7 +231,8 @@ class PostInteractionsTest extends TestCase
 
         $this->get(route('posts.show', $post))
             ->assertOk()
-            ->assertDontSee('post-reactions');
+            ->assertSee('Like')
+            ->assertSee('Dislike');
     }
 
     private function createPost(?User $owner = null): Post
